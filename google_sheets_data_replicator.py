@@ -9,7 +9,7 @@ from googleapiclient.discovery import build
 from googleapiclient import errors as google_errors
 
 class GoogleSheetsDataReplicator:
-    def __init__(self):
+    def __init__(self, config_sheet_id, auth_file):
         self.credentials = None
         self.service = None
         self.sheets_api = None
@@ -19,9 +19,10 @@ class GoogleSheetsDataReplicator:
         self.enable_index = None
         self.tasks = []
         self.configuration_range = 'Configuration!A1:Z50'
-        self.configuration_sheet_id = ''
+        self.configuration_sheet_id = config_sheet_id
         self.credential_token_file = 'token.pickle'
         self.errors = []
+        self.auth_file = auth_file
 
     def run(self):
         self.initialize()
@@ -47,7 +48,7 @@ class GoogleSheetsDataReplicator:
                 self.credentials = pickle.load(token)
 
     def setup_credentials(self):
-        flow = InstalledAppFlow.from_client_secrets_file('credentials.json', ['https://www.googleapis.com/auth/spreadsheets'])
+        flow = InstalledAppFlow.from_client_secrets_file(self.auth_file, ['https://www.googleapis.com/auth/spreadsheets'])
         self.credentials = flow.run_local_server()
         with open(self.credential_token_file, 'wb') as token:
             pickle.dump(self.credentials, token)
@@ -126,14 +127,22 @@ class GoogleSheetsDataReplicator:
 
 
 
-def test():
+def run(id, auth_file):
     try:
         me = singleton.SingleInstance()
-        GoogleSheetsDataReplicator().run()
+        GoogleSheetsDataReplicator(id, auth_file).run()
     except singleton.SingleInstanceException:
         pass
 
 if __name__ == "__main__":
-    test()
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--id', required=True, help='Sheet ID of the configuration sheet')
+    ap.add_argument('--auth', required=False, help='Path to authorization/client secrets json file')
+
+    args = ap.parse_args()
+    run(args.id, args.auth)
+
 
 
