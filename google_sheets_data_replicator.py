@@ -79,7 +79,7 @@ class GoogleSheetsDataReplicator:
                 if response is None: continue
 
                 response['range'] = source_destination_pair['destination_range']
-                write_request = self.sheets_api.values().update(spreadsheetId=task[self.source_sheet_index], range=source_destination_pair['destination_range'], valueInputOption='RAW', body=response)
+                write_request = self.sheets_api.values().update(spreadsheetId=task[self.destination_sheet_index], range=source_destination_pair['destination_range'], valueInputOption='RAW', body=response)
                 self.execute_request_or_log_error(write_request, f"Failed to write data for task {task[self.task_id_index]}")
 
 
