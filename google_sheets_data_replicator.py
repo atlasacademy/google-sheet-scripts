@@ -74,7 +74,7 @@ class GoogleSheetsDataReplicator:
                 continue
 
             for source_destination_pair in self.get_source_destination_range_pairs(task):
-                read_request = self.sheets_api.values().get(spreadsheetId=task[self.source_sheet_index], range=source_destination_pair['source_range'], majorDimension='ROWS')
+                read_request = self.sheets_api.values().get(spreadsheetId=task[self.source_sheet_index], range=source_destination_pair['source_range'], majorDimension='ROWS', valueRenderOption='UNFORMATTED_VALUE')
                 response = self.execute_request_or_log_error(read_request, f"Failed to fetch data for task {task[self.task_id_index]}")
                 if response is None: continue
 
